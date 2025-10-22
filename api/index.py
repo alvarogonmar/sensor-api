@@ -10,6 +10,6 @@ def home():
 def about():
     return 'About'
 
-@app.rout('/sensor')
+@app.route('/sensor')
 def sensor():
     return 'super sensor'
