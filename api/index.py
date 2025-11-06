@@ -1,6 +1,10 @@
 import os
 import psycopg2
 from flask import Flask
+from dotenv import load_dotenv
+
+# Load enviroment variables from .env
+load_dotenv()
 
 app = Flask(__name__)
 
