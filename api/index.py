@@ -23,14 +23,19 @@ def sensor():
     try:
         # Connect to the database
         connection = get_connection()
+        print("Connection successfull!")
+        
         cursor = connection.cursor()
+
+        #Example query
         cursor.execute("SELECT NOW();")  # simple query to test connection
         result = cursor.fetchone()
+        print("Current Time: ", result)
 
-        # Clean up
+        # Close the cursor and connection
         cursor.close()
         connection.close()
 
-        return f"Connection successful! Server time: {result[0]}"
+        return f"Current time: {result}"
     except Exception as e:
         return f"Error: {str(e)}"
