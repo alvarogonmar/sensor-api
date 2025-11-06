@@ -17,4 +17,9 @@ def about():
 
 @app.route('/sensor')
 def sensor():
-    return 'super sensor'
+    try:
+        connection = get_connection()
+        print("Connection successfull!")
+
+        # Create a cursor to execute SQL
+        cursor = connection.cursor()
