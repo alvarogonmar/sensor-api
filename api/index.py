@@ -73,3 +73,7 @@ def insert_sensor_value(sensor_id):
     finally:
         if 'conn' in locals():
             conn.close()
+
+@app.route("/hello")
+def hello():
+    return render_html("hello.html")
