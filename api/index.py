@@ -76,4 +76,4 @@ def insert_sensor_value(sensor_id):
 
 @app.route("/hello")
 def hello():
-    return render_template("hello.html", user="Fulanito")
+    return render_template("hello.html", user="Alvaro")
