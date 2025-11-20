@@ -118,31 +118,66 @@ def dashboard():
         device_ids = [row[0] for row in cur.fetchall()]
 
         # ID seleccionado
-        selected_id = request.args.get("device", type=int)
+        selected_raw = request.args.get("device", default=None)
+        selected_id = selected_raw  # puede ser numero o "all"
+
 
         rows = []
         timestamps = []
         values = []
         last_update = None
 
+        # todos
+        if selected_id == "all":
+                    cur.execute("""
+                        SELECT sensor_id, value, created_at
+                        FROM sensores
+                        ORDER BY created_at DESC
+                        LIMIT 100;
+                    """)
+
+            data = cur.fetchall()
+
+            # Redondear
+            rows = [(sid, round(val, 2), t) for sid, val, t in data]
+
+            values = [val for _, val, _ in rows][::-1]
+            timestamps = [t.strftime('%Y-%m-%d %H:%M:%S') for _, _, t in rows][::-1]
+
+            return render_template(
+                "dashboard.html",
+                device_ids=device_ids,
+                selected_id="all",
+                rows=rows,
+                values=values,
+                timestamps=timestamps,
+                last_update=None
+            )
+
+        # 1 sensor
         if selected_id is not None:
-            cur.execute("""
-                SELECT value, created_at
-                FROM sensores
-                WHERE sensor_id = %s
-                ORDER BY created_at DESC
-                LIMIT 10;
-            """, (selected_id,))
+            try:
+                selected_id_int = int(selected_id)
+            except:
+                selected_id_int = None
 
-            rows = cur.fetchall()
-            rows = [(round(value, 2), created_at) for value, created_at in rows]
+            if selected_id_int is not None:
+                cur.execute("""
+                    SELECT value, created_at
+                    FROM sensores
+                    WHERE sensor_id = %s
+                    ORDER BY created_at DESC
+                    LIMIT 10;
+                """, (selected_id_int,))
 
+                data = cur.fetchall()
 
-            # Preparar datos para la tabla y la gráfica
-            if rows:
-                values = [r[0] for r in rows][::-1]
-                timestamps = [r[1].strftime('%Y-%m-%d %H:%M:%S') for r in rows][::-1]
-                last_update = rows[0][1]
+                rows = [(round(val, 2), t) for val, t in data]
+
+                if rows:
+                    values = [v for v, _ in rows][::-1]
+                    timestamps = [t.strftime('%Y-%m-%d %H:%M:%S') for _, t in rows][::-1]
+                    last_update = rows[0][1]
 
         return render_template(
             "dashboard.html",
