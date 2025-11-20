@@ -27,8 +27,15 @@
         <hr>
 
         {% if selected_id %}
-            <h2>Sensor {{ selected_id }} — Últimas 10 Lecturas</h2>
+        
+            <h2>Información del Dispositivo</h2>
+        
+            <p><strong>Nombre:</strong> Sensor {{ selected_id }}</p>
+            <p><strong>ID:</strong> {{ selected_id }}</p>
             <p><strong>Última actualización:</strong> {{ last_update }}</p>
+        
+            <h2>Sensor {{ selected_id }} — Últimas 10 Lecturas</h2>
+
 
             <h2>📋 Data Table</h2>
             <table>
