@@ -90,6 +90,34 @@
     {% endif %}
 
 {% endif %}
+        
+{% if values and timestamps %}
+<script>
+    const ctx = document.getElementById('sensorChart');
+
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ timestamps|tojson }},
+            datasets: [{
+                label: 'Sensor Value',
+                data: {{ values|tojson }},
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            scales: {
+                x: { title: { display: true, text: 'Time' }},
+                y: { title: { display: true, text: 'Value' }}
+            }
+        }
+    });
+</script>
+{% endif %}
+
 
 
 </body>
