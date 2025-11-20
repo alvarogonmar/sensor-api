@@ -52,70 +52,45 @@
             <h2>📈 Graph</h2>
             <canvas id="sensorChart"></canvas>
         
-        {% else %}
-
-        {% if selected_id %}
-        
-            <h2>Información del Dispositivo</h2>
-        
-            <p><strong>Nombre:</strong> Sensor {{ selected_id }}</p>
-            <p><strong>ID:</strong> {{ selected_id }}</p>
-            <p><strong>Última actualización:</strong> {{ last_update }}</p>
-        
-            <h2>Sensor {{ selected_id }} — Últimas 10 Lecturas</h2>
-
-
-            <h2>📋 Data Table</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Timestamp</th>
-                        <th>Valor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for value, created_at in rows %}
-                    <tr>
-                        <td>{{ created_at }}</td>
-                        <td>{{ value }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-
-            <h2>📈 Graph</h2>
-            <canvas id="sensorChart"></canvas>
-
-        {% else %}
-            <p>Selecciona un sensor para mostrar datos.</p>
-        {% endif %}
-    </div>
+{% else %}
 
     {% if selected_id %}
-    <script>
-        const ctx = document.getElementById('sensorChart');
-        const chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {{ timestamps|tojson }},
-                datasets: [{
-                    label: 'Sensor Value',
-                    data: {{ values|tojson }},
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    tension: 0.3,
-                    fill: true
-                }]
-            },
-            options: {
-                scales: {
-                    x: { title: { display: true, text: 'Time' }},
-                    y: { title: { display: true, text: 'Value' }}
-                }
-            }
-        });
-    </script>
+        
+        <h2>Información del Dispositivo</h2>
+
+        <p><strong>Nombre:</strong> Sensor {{ selected_id }}</p>
+        <p><strong>ID:</strong> {{ selected_id }}</p>
+        <p><strong>Última actualización:</strong> {{ last_update }}</p>
+
+        <h2>Sensor {{ selected_id }} — Últimas 10 Lecturas</h2>
+
+        <h2>📋 Data Table</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for value, created_at in rows %}
+                <tr>
+                    <td>{{ created_at }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>📈 Graph</h2>
+        <canvas id="sensorChart"></canvas>
+
+    {% else %}
+        <p>Selecciona un sensor para mostrar datos.</p>
     {% endif %}
+
+{% endif %}
+
 
 </body>
 </html>
