@@ -106,3 +106,57 @@ def get_sensor(sensor_id):
 @app.route("/hello")
 def hello():
     return render_template("hello.html", user="Alvaro")
+
+@app.route("/dashboard")
+def dashboard():
+    selected_id = request.args.get("device", default=None, type=int)
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+
+        # 1. Obtener todos los device_ids disponibles
+        cur.execute("SELECT DISTINCT sensor_id FROM sensores ORDER BY sensor_id;")
+        device_ids = [row[0] for row in cur.fetchall()]
+
+        device_info = None
+        sensor_values = []
+        last_update = None
+
+        # 2. Si el usuario seleccionó un device → obtener datos
+        if selected_id is not None:
+            # Obtener últimos valores
+            cur.execute("""
+                SELECT value, created_at 
+                FROM sensores 
+                WHERE sensor_id = %s 
+                ORDER BY created_at DESC 
+                LIMIT 10;
+            """, (selected_id,))
+            rows = cur.fetchall()
+
+            sensor_values = rows
+            if rows:
+                last_update = rows[0][1]
+
+            # Device info de ejemplo (puedes conectar otra tabla si existe)
+            device_info = {
+                "id": selected_id,
+                "name": f"Sensor {selected_id}"
+            }
+
+        return render_template(
+            "dashboard.html",
+            device_ids=device_ids,
+            selected_id=selected_id,
+            device_info=device_info,
+            sensor_values=sensor_values,
+            last_update=last_update
+        )
+
+    except Exception as e:
+        return f"Error: {e}"
+
+    finally:
+        if 'conn' in locals():
+            conn.close()
