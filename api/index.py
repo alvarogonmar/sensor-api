@@ -119,30 +119,33 @@ def dashboard():
 
         # ID seleccionado
         selected_raw = request.args.get("device", default=None)
-        selected_id = selected_raw  # puede ser numero o "all"
-
+        selected_id = selected_raw  # puede ser número o "all"
 
         rows = []
         timestamps = []
         values = []
         last_update = None
 
-        # todos
+        # -----------------------------
+        #       CASO: TODOS
+        # -----------------------------
         if selected_id == "all":
-                    cur.execute("""
-                        SELECT sensor_id, value, created_at
-                        FROM sensores
-                        ORDER BY created_at DESC
-                        LIMIT 100;
-                    """)
+            cur.execute("""
+                SELECT sensor_id, value, created_at
+                FROM sensores
+                ORDER BY created_at DESC
+                LIMIT 100;
+            """)
 
             data = cur.fetchall()
 
-            # Redondear
+            # Redondear datos
             rows = [(sid, round(val, 2), t) for sid, val, t in data]
 
             values = [val for _, val, _ in rows][::-1]
-            timestamps = [t.strftime('%Y-%m-%d %H:%M:%S') for _, _, t in rows][::-1]
+            timestamps = [
+                t.strftime('%Y-%m-%d %H:%M:%S') for _, _, t in rows
+            ][::-1]
 
             return render_template(
                 "dashboard.html",
@@ -154,7 +157,9 @@ def dashboard():
                 last_update=None
             )
 
-        # 1 sensor
+        # -----------------------------
+        #       CASO: SENSOR ÚNICO
+        # -----------------------------
         if selected_id is not None:
             try:
                 selected_id_int = int(selected_id)
@@ -176,7 +181,9 @@ def dashboard():
 
                 if rows:
                     values = [v for v, _ in rows][::-1]
-                    timestamps = [t.strftime('%Y-%m-%d %H:%M:%S') for _, t in rows][::-1]
+                    timestamps = [
+                        t.strftime('%Y-%m-%d %H:%M:%S') for _, t in rows
+                    ][::-1]
                     last_update = rows[0][1]
 
         return render_template(
