@@ -4,19 +4,21 @@
     <meta charset="UTF-8">
     <title>Dashboard Sensores</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
     <div class="container">
         <h1>Dashboard de Sensores</h1>
 
-        <!-- Selección de dispositivo -->
+        <!-- Dropdown -->
         <form method="get" action="/dashboard">
-            <label for="device">Selecciona un dispositivo:</label>
-            <select name="device" id="device">
+            <label>Seleccionar sensor:</label>
+            <select name="device">
                 {% for dev in device_ids %}
-                    <option value="{{ dev }}" {% if selected_id == dev %}selected{% endif %}>
-                        Sensor {{ dev }}
-                    </option>
+                <option value="{{ dev }}" {% if selected_id == dev %}selected{% endif %}>
+                    Sensor {{ dev }}
+                </option>
                 {% endfor %}
             </select>
             <button type="submit">Mostrar</button>
@@ -24,13 +26,11 @@
 
         <hr>
 
-        {% if device_info %}
-            <h2>Información del Dispositivo</h2>
-            <p><strong>Nombre:</strong> {{ device_info.name }}</p>
-            <p><strong>ID:</strong> {{ device_info.id }}</p>
+        {% if selected_id %}
+            <h2>Sensor {{ selected_id }} — Últimas 10 Lecturas</h2>
             <p><strong>Última actualización:</strong> {{ last_update }}</p>
 
-            <h2>Últimos Valores</h2>
+            <h2>📋 Data Table</h2>
             <table>
                 <thead>
                     <tr>
@@ -39,7 +39,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for value, created_at in sensor_values %}
+                    {% for value, created_at in rows %}
                     <tr>
                         <td>{{ created_at }}</td>
                         <td>{{ value }}</td>
@@ -47,9 +47,40 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+            <h2>📈 Graph</h2>
+            <canvas id="sensorChart"></canvas>
+
         {% else %}
-            <p>Selecciona un dispositivo para ver su información.</p>
+            <p>Selecciona un sensor para mostrar datos.</p>
         {% endif %}
     </div>
+
+    {% if selected_id %}
+    <script>
+        const ctx = document.getElementById('sensorChart');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ timestamps|tojson }},
+                datasets: [{
+                    label: 'Sensor Value',
+                    data: {{ values|tojson }},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                scales: {
+                    x: { title: { display: true, text: 'Time' }},
+                    y: { title: { display: true, text: 'Value' }}
+                }
+            }
+        });
+    </script>
+    {% endif %}
+
 </body>
 </html>
