@@ -135,6 +135,8 @@ def dashboard():
             """, (selected_id,))
 
             rows = cur.fetchall()
+            rows = [(round(value, 2), created_at) for value, created_at in rows]
+
 
             # Preparar datos para la tabla y la gráfica
             if rows:
